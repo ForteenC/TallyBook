@@ -2,10 +2,11 @@ package top.webdbw.tallybook;
 
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-public class MainActivity extends AppCompatActivity {
+import top.webdbw.tallybook.base.BaseActivity;
+
+public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment mainFragment = MainFragment.newInstance(savedInstanceState);
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(android.R.id.content, mainFragment)
+                .replace(android.R.id.content, mainFragment)
                 .commitAllowingStateLoss();
     }
 }

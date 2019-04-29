@@ -6,10 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
 import top.webdbw.tallybook.model.MainListItem;
 
 public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerViewAdapter.MainViewHolder> {
@@ -20,6 +21,25 @@ public class MainRecyclerViewAdapter extends RecyclerView.Adapter<MainRecyclerVi
     public MainRecyclerViewAdapter(@NonNull Context context, @NonNull List<MainListItem> data) {
         mContext = context;
         mData = data;
+    }
+
+    public void addItem(MainListItem item) {
+        this.addItem(item, getItemCount());
+    }
+
+    public void addItem(MainListItem item, int position) {
+        if (0 <= position && position <= getItemCount()) {
+            mData.add(position, item);
+
+            notifyItemInserted(position);
+        }
+    }
+
+    public void removeItem(int position) {
+        if (0 <= position && position <= getItemCount()) {
+            mData.remove(position);
+            notifyItemRemoved(position);
+        }
     }
 
     @NonNull

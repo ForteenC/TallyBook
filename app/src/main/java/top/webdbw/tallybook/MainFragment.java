@@ -6,21 +6,26 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import top.webdbw.tallybook.anim.MainRecyclerViewAnimator;
 import top.webdbw.tallybook.model.MainListItem;
 
+/**
+ * 主页面
+ */
 public class MainFragment extends Fragment implements View.OnClickListener {
 
     private Context mContext;
@@ -28,6 +33,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     private RecyclerView mRecyclerView;
     private MainRecyclerViewAdapter mAdapter;
     private FloatingActionButton mFloatButton;
+    private Toolbar mToolbar;
 
     public static MainFragment newInstance(Bundle args) {
         MainFragment mainFragment = new MainFragment();
@@ -38,7 +44,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         mContext = context;
     }
@@ -52,6 +58,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.main_home_layout, container, false);
+        mToolbar = view.findViewById(R.id.toolbar);
         mRecyclerView = view.findViewById(R.id.recycler_main);
         mFloatButton = view.findViewById(R.id.float_btn_add);
         mFloatButton.setOnClickListener(this);
@@ -62,11 +69,26 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        initToolBar();
+
+        initRecyclerView();
+    }
+
+    private void initToolBar() {
+        TextView title = mToolbar.findViewById(R.id.toolbar_title);
+        title.setText("2019年4月20日");
+    }
+
+    private void initRecyclerView() {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         mAdapter = new MainRecyclerViewAdapter(mContext, createData());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new MainItemDecoration(mContext.getResources().getDimensionPixelOffset(R.dimen.main_list_item_offset)));
+
+        MainRecyclerViewAnimator animator = new MainRecyclerViewAnimator();
+        animator.setAddDuration(3000);
+        animator.setRemoveDuration(3000);
+        mRecyclerView.setItemAnimator(animator);
     }
 
     //TODO 临时拼接一个数据，后续接入网络请求
@@ -86,11 +108,20 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         int viewId = v.getId();
         if (viewId == R.id.float_btn_add) {
-            DetailFragment detailFragment = new DetailFragment();
-            FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            transaction.add(R.id.container_main, detailFragment).addToBackStack(null).commit();
+//            DetailFragment detailFragment = new DetailFragment();
+//            FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+//            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+//            transaction.add(R.id.container_main, detailFragment).addToBackStack(null).commit();
+            addItem();
         }
+    }
+
+    private void addItem() {
+        MainListItem item = new MainListItem();
+        item.content = "新加的View";
+        item.type = 3;
+
+        mAdapter.addItem(item, 2);
     }
 
     private class MainItemDecoration extends RecyclerView.ItemDecoration {
@@ -105,9 +136,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
             super.getItemOffsets(outRect, view, parent, state);
 
-            if (parent.getChildAdapterPosition(view) != 0) {
-                outRect.top = offset;
-            }
+            outRect.top = offset;
         }
     }
 
